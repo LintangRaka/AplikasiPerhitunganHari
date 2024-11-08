@@ -5,7 +5,6 @@ import java.time.LocalDate;
  * Click nbfs://nbhost/SystemFileSystem/Templates/Licenses/license-default.txt to change this license
  * Click nbfs://nbhost/SystemFileSystem/Templates/GUIForms/JFrame.java to edit this template
  */
-
 /**
  *
  * @author Acer
@@ -38,6 +37,8 @@ public class PerhitunganHariFrame extends javax.swing.JFrame {
         cbbBulan = new javax.swing.JComboBox<>();
         spnTahun = new javax.swing.JSpinner();
         btnHitung = new javax.swing.JButton();
+        jLabel3 = new javax.swing.JLabel();
+        datePerbandingan = new com.toedter.calendar.JDateChooser();
 
         setDefaultCloseOperation(javax.swing.WindowConstants.EXIT_ON_CLOSE);
 
@@ -66,7 +67,6 @@ public class PerhitunganHariFrame extends javax.swing.JFrame {
         gridBagConstraints.gridx = 0;
         gridBagConstraints.gridy = 1;
         gridBagConstraints.fill = java.awt.GridBagConstraints.BOTH;
-        gridBagConstraints.weightx = 0.1;
         gridBagConstraints.insets = new java.awt.Insets(8, 8, 8, 8);
         jPanel1.add(jLabel1, gridBagConstraints);
 
@@ -76,7 +76,6 @@ public class PerhitunganHariFrame extends javax.swing.JFrame {
         gridBagConstraints.gridx = 0;
         gridBagConstraints.gridy = 2;
         gridBagConstraints.fill = java.awt.GridBagConstraints.BOTH;
-        gridBagConstraints.weightx = 0.1;
         gridBagConstraints.insets = new java.awt.Insets(8, 8, 8, 8);
         jPanel1.add(jLabel2, gridBagConstraints);
 
@@ -90,6 +89,7 @@ public class PerhitunganHariFrame extends javax.swing.JFrame {
         gridBagConstraints.gridx = 1;
         gridBagConstraints.gridy = 1;
         gridBagConstraints.fill = java.awt.GridBagConstraints.BOTH;
+        gridBagConstraints.weightx = 0.3;
         gridBagConstraints.insets = new java.awt.Insets(8, 8, 8, 8);
         jPanel1.add(cbbBulan, gridBagConstraints);
 
@@ -103,6 +103,7 @@ public class PerhitunganHariFrame extends javax.swing.JFrame {
         gridBagConstraints.gridx = 1;
         gridBagConstraints.gridy = 2;
         gridBagConstraints.fill = java.awt.GridBagConstraints.BOTH;
+        gridBagConstraints.weightx = 0.3;
         gridBagConstraints.insets = new java.awt.Insets(8, 8, 8, 8);
         jPanel1.add(spnTahun, gridBagConstraints);
 
@@ -114,10 +115,26 @@ public class PerhitunganHariFrame extends javax.swing.JFrame {
         });
         gridBagConstraints = new java.awt.GridBagConstraints();
         gridBagConstraints.gridx = 1;
-        gridBagConstraints.gridy = 3;
+        gridBagConstraints.gridy = 4;
         gridBagConstraints.fill = java.awt.GridBagConstraints.BOTH;
         gridBagConstraints.insets = new java.awt.Insets(4, 4, 4, 4);
         jPanel1.add(btnHitung, gridBagConstraints);
+
+        jLabel3.setHorizontalAlignment(javax.swing.SwingConstants.TRAILING);
+        jLabel3.setText("Tanggal perbandingan");
+        gridBagConstraints = new java.awt.GridBagConstraints();
+        gridBagConstraints.gridx = 0;
+        gridBagConstraints.gridy = 3;
+        gridBagConstraints.fill = java.awt.GridBagConstraints.BOTH;
+        gridBagConstraints.insets = new java.awt.Insets(8, 8, 8, 8);
+        jPanel1.add(jLabel3, gridBagConstraints);
+        gridBagConstraints = new java.awt.GridBagConstraints();
+        gridBagConstraints.gridx = 1;
+        gridBagConstraints.gridy = 3;
+        gridBagConstraints.fill = java.awt.GridBagConstraints.BOTH;
+        gridBagConstraints.weightx = 0.4;
+        gridBagConstraints.insets = new java.awt.Insets(8, 8, 8, 8);
+        jPanel1.add(datePerbandingan, gridBagConstraints);
 
         getContentPane().add(jPanel1, java.awt.BorderLayout.NORTH);
 
@@ -196,12 +213,14 @@ public class PerhitunganHariFrame extends javax.swing.JFrame {
     }
 
     private void tampilkanHasil() {
-        // Ambil bulan (1-12) dan tahun dari ComboBox dan Spinner
-        int bulan = cbbBulan.getSelectedIndex() + 1; // Index ComboBox mulai dari 0, jadi tambahkan 1
-        int tahun = (int) spnTahun.getValue();
+        // Ambil tanggal yang dipilih di JCalendar
+        java.util.Calendar calendar = calendar1.getCalendar();
+        int tahun = calendar.get(java.util.Calendar.YEAR);
+        int bulan = calendar.get(java.util.Calendar.MONTH) + 1; // JCalendar bulan 0-11, jadi tambahkan 1
+        int hari = calendar.get(java.util.Calendar.DAY_OF_MONTH);
 
-        // Buat LocalDate untuk hari pertama bulan yang dipilih
-        LocalDate date = LocalDate.of(tahun, bulan, 1);
+        // Buat LocalDate untuk tanggal yang dipilih di JCalendar
+        LocalDate date = LocalDate.of(tahun, bulan, hari);
 
         // Hitung jumlah hari di bulan yang dipilih
         int jumlahHari = date.lengthOfMonth();
@@ -209,22 +228,49 @@ public class PerhitunganHariFrame extends javax.swing.JFrame {
         // Cek apakah tahun tersebut kabisat
         boolean isKabisat = date.isLeapYear();
 
+        // Hari pertama di bulan (tanggal 1)
+        String hariPertama = date.getDayOfWeek().toString();  // Mengambil nama hari pertama (contoh: MONDAY, TUESDAY, dst)
+
+        // Hari terakhir di bulan
+        String hariTerakhir = date.withDayOfMonth(jumlahHari).getDayOfWeek().toString(); // Nama hari terakhir bulan
+
+        // Ambil tanggal dari JDateChooser
+        java.util.Date selectedDate = datePerbandingan.getDate();
+        if (selectedDate == null) {
+            // Jika tidak ada tanggal yang dipilih di JDateChooser
+            txtHasil.setText("Silakan pilih tanggal di JDateChooser untuk perbandingan.");
+            return;
+        }
+
+        // Konversi tanggal yang dipilih dari JDateChooser ke LocalDate
+        LocalDate datePerbandinganLocal = selectedDate.toInstant()
+                .atZone(java.time.ZoneId.systemDefault())
+                .toLocalDate();
+
+        long selisihHari = java.time.temporal.ChronoUnit.DAYS.between(date, datePerbandinganLocal); // Hitung selisih hari
+
         // Format hasilnya
         String hasil = "Bulan: " + cbbBulan.getSelectedItem() + "\n"
                 + "Tahun: " + tahun + "\n"
                 + "Jumlah Hari: " + jumlahHari + "\n"
-                + (isKabisat ? "Tahun ini adalah tahun kabisat!" : "Tahun ini bukan tahun kabisat.");
+                + (isKabisat ? "Tahun ini adalah tahun kabisat!" : "Tahun ini bukan tahun kabisat.") + "\n"
+                + "Hari Pertama: " + hariPertama + "\n"
+                + "Hari Terakhir: " + hariTerakhir + "\n"
+                + "Selisih Hari: " + Math.abs(selisihHari) + " hari"; // Tampilkan selisih hari
 
         // Tampilkan hasil ke JTextArea
         txtHasil.setText(hasil);
+
     }
 
     // Variables declaration - do not modify//GEN-BEGIN:variables
     private javax.swing.JButton btnHitung;
     private com.toedter.calendar.JCalendar calendar1;
     private javax.swing.JComboBox<String> cbbBulan;
+    private com.toedter.calendar.JDateChooser datePerbandingan;
     private javax.swing.JLabel jLabel1;
     private javax.swing.JLabel jLabel2;
+    private javax.swing.JLabel jLabel3;
     private javax.swing.JPanel jPanel1;
     private javax.swing.JScrollPane jScrollPane1;
     private javax.swing.JSpinner spnTahun;
